@@ -1,5 +1,5 @@
 %{
-#include "as.tab.h" 
+#include "as.tab.h"
 %}
 
 CHIFFRE [0-9]
@@ -33,8 +33,8 @@ while       {return tWHILE;}
 [   \n]    {}
 ","    {return tV;}
 ";"    {return tPV;}
-{CHIFFRE}+([eE]{CHIFFRE}+)?    {return tNB;}
-{LETTRE}({CHIFFRE}|{LETTRE}|_)*    {return tID;}
+{CHIFFRE}+([eE]{CHIFFRE}+)?    {yylval.nb = (int) atof(yytext);return tNB;}
+{LETTRE}({CHIFFRE}|{LETTRE}|_)*    {yylval.str = malloc(yyleng*sizeof(char)); strcpy(yylval.str, yytext); return tID;}
 
 
 %%

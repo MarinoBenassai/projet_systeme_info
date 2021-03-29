@@ -1,29 +1,34 @@
 %{
 #include <stdio.h>
-
-string * variables_declares[] = [];
-int adresses[] = [];
-
+#include <stdlib.h>
+#include "table_symbole.c"
 %}
-
-%token tMAIN tCONST tINT tPRINT tEQ tPO tPF tAO tAF tPV tNB tID tV tIF tAND tOR tEQ2 tDIFF tSUP tINF tNOT tWHILE
+%token tMAIN tCONST tINT tPRINT tEQ tPO tPF tAO tAF tPV tV tIF tAND tOR tEQ2 tDIFF tSUP tINF tNOT tWHILE
 %left tPLUS tMINUS
 %left tMUL tDIV
+
+%union {
+    char * str;
+    int nb;
+}
+
+%token <nb> tNB
+%token <str> tID
 
 
 %%
 
-C : tINT tMAIN tPO tPF Body
+C : tINT tMAIN tPO tPF Body {afficher_table();}
 ;
-Body : tAO Instructions tAF {printf("%d\n", test);}
+Body : tAO Instructions tAF
 ;
 Instructions : Instruction Instructions | 
 ;
 Instruction : Aff | Decl | Print | If | While;
 ;
-Aff : tID tEQ E tPV
+Aff : tID tEQ E tPV {initialiser_variable($1);}
 ;
-E : tNB 
+E : tNB
 | tID 
 | E tPLUS E 
 | E tMUL E 
@@ -32,14 +37,13 @@ E : tNB
 | tPO E tPF 
 | tMINUS E %prec tMUL
 ;
-Decl : tINT tIDs tEQ E tPV 
-|tCONST tINT tIDs tEQ E tPV
-|tINT tIDs tPV
+Decl : tINT tIDs tPV 
 |tCONST tINT tIDs tPV
-{}
 ;
-tIDs : tID tV tIDs
-|tID
+tIDs : tID tV tIDs {ajouter_variable ($1, "int", 0);}
+|tID tEQ E tV tIDs {ajouter_variable ($1, "int", 1);}
+|tID {ajouter_variable ($1, "int", 0);}
+|tID tEQ E {ajouter_variable ($1, "int", 1);}
 ;
 Print : tPRINT tPO tID tPF tPV
 |tPRINT tPO tNB tPF tPV
