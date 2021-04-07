@@ -13,6 +13,6 @@ as.tab.c : as.y
 clean :
 	rm *.yy.c
 	rm *.tab.c
-	rm *.h
+	rm *.tab.h
 	rm *.o
 
