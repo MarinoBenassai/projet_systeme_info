@@ -11,18 +11,24 @@ void ajouter_variable (char * id, char * type, int init) {
 
 void afficher_table(void){
     int i;
+    printf("\n------------------------\n");
+    printf("nb_variables = %d\n",nb_variables);
     for (i = 0; i<nb_variables;i++){
         printf("%s %s %d\n",table_symboles[i].id,table_symboles[i].type,table_symboles[i].init);
     }
+    printf("------------------------\n");
 }
 
 int adresse(char * id){
+    afficher_table();
+
     int i = 0;
     while (i < nb_variables && !strcmp(table_symboles[i].id,id)){
         i++;
     }
     if (i == nb_variables){
         printf("Erreur: la variable %s n'existe pas\n",id);
+        return -1;
     }
     else{
         return i;
@@ -44,3 +50,21 @@ void initialiser_variable (char * id) {
         printf("Val %d\n",table_symboles[i].init);
     }
 }
+
+char * ajouter_temp(){
+    printf("Ajout temp\n");
+    char * id = malloc(sizeof(char) * (4 + 12 + 1));
+    sprintf(id, "%d", num_temp);
+    strcat(id,"temp");
+    ajouter_variable (id, "int", 1);
+    num_temp += 1;
+    afficher_table();
+    return id;
+}
+
+void supprimer_temp(){
+    printf("Supression temp\n");
+    nb_variables -= 1;
+}
+
+
