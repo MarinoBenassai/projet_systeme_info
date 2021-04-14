@@ -8,7 +8,7 @@ lex.yy.c : al.l
 	flex al.l
 
 as.tab.c : as.y
-	bison -d as.y
+	bison -d -v as.y
 
 clean :
 	rm *.yy.c

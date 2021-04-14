@@ -22,11 +22,21 @@ void creer_fichier(void){
     FILE * fPt1, * fPt2;
     
     fPt1 = fopen("./instructions.txt", "w");
-    fPt2 = fopen("./instructions_text.txt", "w");
+    fPt2 = fopen("./interpreter/input.txt", "w");
     int i;
     for (i = 0; i<nb_instructions; i++) {
-        fprintf(fPt1,"%x %d %d %d\n",table_instructions[i][0],table_instructions[i][1],table_instructions[i][2],table_instructions[i][3]);
-        fprintf(fPt2,"%s %d %d %d\n",nom_instructions[table_instructions[i][0]],table_instructions[i][1],table_instructions[i][2],table_instructions[i][3]);
+        fprintf(fPt1,"%x %d",table_instructions[i][0],table_instructions[i][1]);
+        fprintf(fPt2,"%s %d",nom_instructions[table_instructions[i][0]],table_instructions[i][1]);
+        if (table_instructions[i][2] != -1) {
+            fprintf(fPt1," %d",table_instructions[i][2]);
+            fprintf(fPt2," %d",table_instructions[i][2]);
+        }
+        if (table_instructions[i][3] != -1) {
+            fprintf(fPt1," %d",table_instructions[i][3]);
+            fprintf(fPt2," %d",table_instructions[i][3]);
+        }
+        fprintf(fPt1,"\n");
+        fprintf(fPt2,"\n");
     }
 
     fclose(fPt1);
