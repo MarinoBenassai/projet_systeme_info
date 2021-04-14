@@ -20,7 +20,7 @@
 
 %%
 
-C : tINT tMAIN tPO tPF Body {afficher_table();afficher_instructions();}
+C : tINT tMAIN tPO tPF Body {creer_fichier(); afficher_table();afficher_instructions();}
 ;
 Body : tAO Instructions tAF
 ;

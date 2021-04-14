@@ -10,20 +10,20 @@ void ajouter_variable (char * id, char * type, int init) {
 }
 
 void afficher_table(void){
-    int i;
+    /*int i;
     printf("\n------------------------\n");
     printf("nb_variables = %d\n",nb_variables);
     for (i = 0; i<nb_variables;i++){
         printf("%s %s %d\n",table_symboles[i].id,table_symboles[i].type,table_symboles[i].init);
     }
-    printf("------------------------\n");
+    printf("------------------------\n");*/
 }
 
 int adresse(char * id){
     afficher_table();
 
     int i = 0;
-    while (i < nb_variables && !strcmp(table_symboles[i].id,id)){
+    while (i < nb_variables && strcmp(table_symboles[i].id,id)){
         i++;
     }
     if (i == nb_variables){
