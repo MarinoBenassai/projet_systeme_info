@@ -1,5 +1,7 @@
 %{
 #include "as.tab.h"
+
+int num_line = 1;
 %}
 
 CHIFFRE [0-9]
@@ -13,6 +15,7 @@ const    {return tCONST;}
 int    {return tINT;}
 printf    {return tPRINT;}
 if      {return tIF;}
+else	{return tELSE;}
 while       {return tWHILE;}
 &&        {return tAND;}
 "||"      {return tOR;}
@@ -30,12 +33,14 @@ while       {return tWHILE;}
 ")"    {return tPF;}
 "{"    {return tAO;}
 "}"    {return tAF;}
-[   \n]    {}
+[   ]    {}
+"\n"	{num_line += 1;}
 ","    {return tV;}
 ";"    {return tPV;}
 {CHIFFRE}+([eE]{CHIFFRE}+)?    {yylval.nb = (int) atof(yytext);return tNB;}
 {LETTRE}({CHIFFRE}|{LETTRE}|_)*    {yylval.str = malloc(yyleng*sizeof(char)); strcpy(yylval.str, yytext); return tID;}
-
+"&"	{return tREF;}
+. {fprintf(stderr, "Erreur ligne %d: Symbole inconnu: %s.\n",num_line,yytext);exit(1);}
 
 %%
 

@@ -1,5 +1,6 @@
 #include "table_symbole.h"
 
+extern int num_line;
 
 void ajouter_variable (char * id, char * type, int init) {
     table_symboles = realloc(table_symboles,(nb_variables + 1) * sizeof(struct variable));
@@ -27,12 +28,22 @@ int adresse(char * id){
         i++;
     }
     if (i == nb_variables){
-        printf("Erreur: la variable %s n'existe pas\n",id);
-        return -1;
+        fprintf(stderr, "Erreur ligne %d: la variable %s n'existe pas\n",num_line,id);
+        exit(1);
     }
     else{
         return i;
     }
+}
+
+char * nom_var (int adresse){
+   if (adresse < 0 || adresse >= nb_variables){
+      fprintf(stderr, "Erreur ligne %d: l'adresse %d est invalide.\n",num_line,adresse);
+      exit(1);
+   }
+   else{
+      return table_symboles[nb_variables].id;
+   }
 }
 
 void initialiser_variable (char * id) {
@@ -41,7 +52,8 @@ void initialiser_variable (char * id) {
         i++;
     }
     if (i == nb_variables){
-        printf("Erreur: la variable %s n'existe pas\n",id);
+        fprintf(stderr, "Erreur ligne %d: la variable %s n'existe pas\n",num_line,id);
+        exit(1);
     }
     else {
         printf("Variable %s trouvée\n",id);

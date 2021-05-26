@@ -17,13 +17,22 @@ int main () {
         c = 1;
         a = 3;
         printf(a);
-        if (!c != 0){
+        if (!c == 0){
             res = 42;
         }
-        if (c > c || a == !b) {
+        else{
+         res = 53;
+        }
+        if (c > c || !(a != b) && !(b>b)) {
             res = 1515;
         }
     }
+    else {
+    
+    	res = 66;
+    }
     printf(res);
-
+    int cpt = 0;
+    while (cpt < 10) {cpt = cpt + 1;}
+    printf(cpt);
 }

@@ -12,7 +12,7 @@
     int nb;
 }
 
-%token tADD tMUL tSOU tDIV tCOP tAFC tJMP tJMF tINF tSUP tEQU tPRI
+%token tADD tMUL tSOU tDIV tCOP tAFC tJMP tJMF tINF tSUP tEQU tPRI tDEG tDED
 
 %token <nb> tNB
 
@@ -53,6 +53,10 @@ Instruction:
         {asm_add_3(EQU, $2, $3, $4);}
     | tPRI tNB
         {asm_add_1(PRI, $2);}
+    | tDEG tNB tNB
+        {asm_add_2(DEG, $2, $3);}
+    | tDED tNB tNB
+        {asm_add_2(DED, $2, $3);}
     ;
 
 

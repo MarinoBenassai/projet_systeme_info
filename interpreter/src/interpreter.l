@@ -18,6 +18,8 @@ INF {return tINF;}
 SUP {return tSUP;}
 EQU {return tEQU;}
 PRI {return tPRI;}
+DEG {return tDEG;}
+DED {return tDED;}
 
 -?[0-9]+  {
         yylval.nb = atoi(yytext);

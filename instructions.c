@@ -24,8 +24,34 @@ int depile_if (void){
     return pile_if[nb_if];
 }
 
-void patch_table(int adresse_if){
-    table_instructions[adresse_if][2] = nb_instructions;
+void empile_else (void){
+    pile_else = realloc(pile_else,(nb_else + 1) * sizeof(int));
+    pile_else[nb_else] = nb_instructions;
+    nb_else += 1;
+    printf("ELSE empile\n");
+}
+
+int depile_else (void){
+    nb_else -= 1;
+    printf("ELSE depile\n");
+    return pile_else[nb_else];
+}
+
+void empile_while (void){
+    pile_while = realloc(pile_while,(nb_while + 1) * sizeof(int));
+    pile_while[nb_while] = nb_instructions;
+    nb_while += 1;
+    printf("WHILE empile %d\n", nb_instructions);
+}
+
+int depile_while (void){
+    nb_while -= 1;
+    printf("WHILE depile\n");
+    return pile_while[nb_while];
+}
+
+void patch_table(int adresse_if, int indice){
+    table_instructions[adresse_if][indice] = nb_instructions;
     printf("Table patchee\n");
 }
 
