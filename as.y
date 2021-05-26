@@ -8,6 +8,7 @@
 %token tMAIN tCONST tINT tPRINT tEQ tPO tPF tAO tAF tPV tV tIF tAND tOR tEQ2 tDIFF tSUP tINF tNOT tWHILE
 %left tOR
 %left tAND
+%left tEQ2
 %left tPLUS tMINUS
 %left tMUL tDIV
 
@@ -19,6 +20,7 @@
 %token <nb> tNB
 %token <str> tID
 %type <str> E
+%type <str> Cond
 
 %%
 
@@ -58,9 +60,36 @@ Print : tPRINT tPO tID tPF tPV {ajouter_instruction(12,adresse($3),-1,-1);}
 |tPRINT tPO tNB tPF tPV {}
 ;
 
-If : tIF tPO Cond tPF Body ;
+If : tIF tPO Cond tPF {empile_if(); ajouter_instruction(8, adresse($3), -1, -1);} Body {int tmp = depile_if(); patch_table(tmp);};
 
-Cond : Cond tAND Cond | Cond tOR Cond | E tEQ2 E | E tDIFF E | E tSUP E | E tINF E | tNOT Cond ;
+Cond : Cond tAND Cond {ajouter_instruction(2, adresse($1), adresse($3), adresse($1)); supprimer_temp(); $$ = $1; printf("AND\n");}
+| Cond tOR Cond {ajouter_instruction(1, adresse($1), adresse($3), adresse($1));
+                 supprimer_temp();
+                 char * temp = ajouter_temp();
+                 ajouter_instruction(6,adresse(temp),0,-1);
+                 ajouter_instruction(10,adresse($1),adresse(temp),adresse($1));
+                 $$ = $1; printf("OR\n");}
+| E tEQ2 E {ajouter_instruction(11, adresse($1), adresse($3), adresse($1)); supprimer_temp(); $$ = $1; printf("EQU\n");}
+| E tDIFF E {ajouter_instruction(11, adresse($1), adresse($3), adresse($1));
+             supprimer_temp();
+             char * temp = ajouter_temp();
+             ajouter_instruction(6,adresse(temp),0,-1);
+             ajouter_instruction(11,adresse($1),adresse(temp),adresse($1));
+             supprimer_temp();
+             $$ = $1;printf("DIFF\n");}
+| E tSUP E {ajouter_instruction(10, adresse($1), adresse($1), adresse($3)); supprimer_temp(); $$ = $1; printf("SUP\n");}
+| E tINF E {ajouter_instruction(9, adresse($1), adresse($1), adresse($3)); supprimer_temp(); $$ = $1; printf("INF\n");}
+| tNOT Cond %prec tAND {char * temp = ajouter_temp(); ajouter_instruction(6,adresse(temp),0,-1); ajouter_instruction(11,adresse($2),adresse(temp),adresse($2)); supprimer_temp(); $$ = $2; printf("NOT\n");}
+| E {char * temp = ajouter_temp();
+     ajouter_instruction(6,adresse(temp),0,-1);
+     ajouter_instruction(11,adresse($1),adresse(temp),adresse($1));
+     supprimer_temp();
+     char * temp2 = ajouter_temp();
+     ajouter_instruction(6,adresse(temp2),0,-1);
+     ajouter_instruction(11,adresse($1),adresse(temp2),adresse($1));
+     supprimer_temp();
+     $$ = $1;printf("EXPR\n");}
+| tPO Cond tPF {$$ = $2;}; 
 
 While : tWHILE tPO Cond tPF Body
 ; 

@@ -11,6 +11,25 @@ void ajouter_instruction (int code, int adresse1, int adresse2, int adresse3 ){
     nb_instructions += 1;
 }
 
+void empile_if (void){
+    pile_if = realloc(pile_if,(nb_if + 1) * sizeof(int));
+    pile_if[nb_if] = nb_instructions;
+    nb_if += 1;
+    printf("IF empile\n");
+}
+
+int depile_if (void){
+    nb_if -= 1;
+    printf("IF depile\n");
+    return pile_if[nb_if];
+}
+
+void patch_table(int adresse_if){
+    table_instructions[adresse_if][2] = nb_instructions;
+    printf("Table patchee\n");
+}
+
+
 void afficher_instructions(void){
     int i;
     for (i = 0; i<nb_instructions;i++){
