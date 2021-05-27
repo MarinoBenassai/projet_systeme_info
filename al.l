@@ -33,8 +33,8 @@ while       {return tWHILE;}
 ")"    {return tPF;}
 "{"    {return tAO;}
 "}"    {return tAF;}
-[   ]    {}
 "\n"	{num_line += 1;}
+[ \t]    {}
 ","    {return tV;}
 ";"    {return tPV;}
 {CHIFFRE}+([eE]{CHIFFRE}+)?    {yylval.nb = (int) atof(yytext);return tNB;}

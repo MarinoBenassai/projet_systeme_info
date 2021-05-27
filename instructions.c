@@ -50,6 +50,7 @@ int depile_while (void){
     return pile_while[nb_while];
 }
 
+
 void patch_table(int adresse_if, int indice){
     table_instructions[adresse_if][indice] = nb_instructions;
     printf("Table patchee\n");

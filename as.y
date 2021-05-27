@@ -13,6 +13,8 @@ extern int num_line;
 %left tEQ2
 %left tPLUS tMINUS
 %left tMUL tDIV
+%left tREF
+%left tNOT
 
 %union {
     char * str;
@@ -28,7 +30,7 @@ extern int num_line;
 
 C : tINT tMAIN tPO tPF Body {creer_fichier(); afficher_table();afficher_instructions();}
 ;
-Body : tAO Instructions tAF
+Body : tAO {empile_etat_tab_var();} Instructions {depile_etat_tab_var();} tAF
 ;
 Instructions : Instruction Instructions | 
 ;
@@ -37,6 +39,7 @@ Instruction : Aff | Decl | Print | If | While;
 Aff : tID tEQ E tPV {ajouter_instruction(5,adresse($1),adresse($3),-1); supprimer_temp();}
 |tMUL E tEQ E tPV {ajouter_instruction(13,adresse($2),adresse($4),-1);supprimer_temp();supprimer_temp();}
 ;
+
 E : tNB {char * temp = ajouter_temp(); ajouter_instruction(6,adresse(temp),$1,-1); $$ = temp; printf("%s = %d\n",temp,$1);}
 | tID {char * temp = ajouter_temp(); ajouter_instruction(5,adresse(temp),adresse($1),-1); $$ = temp; printf("%s = %s\n",temp,$1);}
 | E tPLUS E {ajouter_instruction(1, adresse($1), adresse($3), adresse($1)); supprimer_temp(); $$ = $1; printf("PLUS\n");}
@@ -44,13 +47,15 @@ E : tNB {char * temp = ajouter_temp(); ajouter_instruction(6,adresse(temp),$1,-1
 | E tMINUS E {ajouter_instruction(3, adresse($1), adresse($1), adresse($3)); supprimer_temp(); $$ = $1; printf("MINUS\n");}
 | E tDIV E {ajouter_instruction(4, adresse($1), adresse($1), adresse($3)); supprimer_temp(); $$ = $1; printf("DIV\n");}
 | tPO E tPF {$$ = $2;}
-| tMINUS E %prec tMUL {char * temp = ajouter_temp(); ajouter_instruction(6,adresse(temp),0,-1); ajouter_instruction(3,adresse($2),adresse(temp),adresse($2)); supprimer_temp(); $$ = $2; printf("INV\n");}
-| tMUL E {ajouter_instruction(14,adresse($2),adresse($2),-1);$$ = $2; printf("DEREF\n");}
+| tMINUS E %prec tREF {char * temp = ajouter_temp(); ajouter_instruction(6,adresse(temp),0,-1); ajouter_instruction(3,adresse($2),adresse(temp),adresse($2)); supprimer_temp(); $$ = $2; printf("INV\n");}
+| tMUL E %prec tREF {ajouter_instruction(14,adresse($2),adresse($2),-1);$$ = $2; printf("DEREF\n");}
 | tREF tID {char * temp = ajouter_temp(); ajouter_instruction(6,adresse(temp),adresse($2),-1); $$ = temp; printf("%s = %d\n",temp,adresse($2));printf("REF\n");}
 ;
+
 Decl : tINT tIDs tPV
 |tCONST tINT tIDs tPV
 ;
+
 tIDs : ID_declaration tV tIDs 
       |ID_declaration
 ;
@@ -65,7 +70,7 @@ Print : tPRINT tPO tID tPF tPV {ajouter_instruction(12,adresse($3),-1,-1);}
 |tPRINT tPO tNB tPF tPV {}
 ;
 
-If : tIF tPO Cond tPF {empile_if(); ajouter_instruction(8, adresse($3), -1, -1);} Body_if;
+If : tIF tPO Cond tPF {empile_if(); ajouter_instruction(8, adresse($3), -1, -1);supprimer_temp();} Body_if;
 
 
 Body_if : Body {int tmp = depile_if(); patch_table(tmp,2);}
@@ -88,8 +93,8 @@ Cond : Cond tAND {printf("tAND\n");} Cond {ajouter_instruction(2, adresse($1), a
              $$ = $1;printf("DIFF\n");}
 | E tSUP E {ajouter_instruction(10, adresse($1), adresse($1), adresse($3)); supprimer_temp(); $$ = $1; printf("SUP\n");}
 | E tINF E {ajouter_instruction(9, adresse($1), adresse($1), adresse($3)); supprimer_temp(); $$ = $1; printf("INF\n");}
-| tNOT Cond %prec tEQ2 {char * temp = ajouter_temp(); ajouter_instruction(6,adresse(temp),0,-1); ajouter_instruction(11,adresse($2),adresse(temp),adresse($2)); supprimer_temp(); $$ = $2; printf("NOT\n");}
-| E {char * temp = ajouter_temp();
+| tNOT Cond {char * temp = ajouter_temp(); ajouter_instruction(6,adresse(temp),0,-1); ajouter_instruction(11,adresse($2),adresse(temp),adresse($2)); supprimer_temp(); $$ = $2; printf("NOT\n");}
+/*| E {char * temp = ajouter_temp();
      ajouter_instruction(6,adresse(temp),0,-1);
      ajouter_instruction(11,adresse($1),adresse(temp),adresse($1));
      supprimer_temp();
@@ -97,10 +102,11 @@ Cond : Cond tAND {printf("tAND\n");} Cond {ajouter_instruction(2, adresse($1), a
      ajouter_instruction(6,adresse(temp2),0,-1);
      ajouter_instruction(11,adresse($1),adresse(temp2),adresse($1));
      supprimer_temp();
-     $$ = $1;printf("EXPR\n");}
-| tPO Cond tPF {$$ = $2;}; 
+     $$ = $1;printf("EXPR\n");}*/
+| tPO Cond tPF {$$ = $2;}
+; 
 
-While : tWHILE {empile_while();} tPO Cond tPF {empile_while(); ajouter_instruction(8,adresse($4),-1,-1);} Body {int tmp1 = depile_while(); int tmp2 = depile_while(); ajouter_instruction(7,tmp2,-1,-1); patch_table(tmp1,2);}; 
+While : tWHILE {empile_while();} tPO Cond tPF {empile_while(); ajouter_instruction(8,adresse($4),-1,-1);supprimer_temp();} Body {int tmp1 = depile_while(); int tmp2 = depile_while(); ajouter_instruction(7,tmp2,-1,-1); patch_table(tmp1,2);}; 
 
 %%
 

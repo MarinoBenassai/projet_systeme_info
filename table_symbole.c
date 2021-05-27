@@ -3,6 +3,14 @@
 extern int num_line;
 
 void ajouter_variable (char * id, char * type, int init) {
+    int i = 0;
+    while (i < nb_variables && strcmp(table_symboles[i].id,id)){
+        i++;
+    }
+    if (i != nb_variables){
+        fprintf(stderr, "Erreur ligne %d: la variable %s existe deja;\n",num_line,id);
+        exit(1);
+    }
     table_symboles = realloc(table_symboles,(nb_variables + 1) * sizeof(struct variable));
     table_symboles[nb_variables].id = id;
     table_symboles[nb_variables].type = type;
@@ -11,13 +19,13 @@ void ajouter_variable (char * id, char * type, int init) {
 }
 
 void afficher_table(void){
-    /*int i;
+    int i;
     printf("\n------------------------\n");
     printf("nb_variables = %d\n",nb_variables);
     for (i = 0; i<nb_variables;i++){
         printf("%s %s %d\n",table_symboles[i].id,table_symboles[i].type,table_symboles[i].init);
     }
-    printf("------------------------\n");*/
+    printf("------------------------\n");
 }
 
 int adresse(char * id){
@@ -79,4 +87,17 @@ void supprimer_temp(){
     nb_variables -= 1;
 }
 
+
+void empile_etat_tab_var (void){
+    pile_etat_var = realloc(pile_etat_var,(nb_etat_var + 1) * sizeof(int));
+    pile_etat_var[nb_etat_var] = nb_variables;
+    nb_etat_var += 1;
+    printf("ETAT empile %d\n", nb_variables);
+}
+
+void depile_etat_tab_var (void){
+    nb_etat_var -= 1;
+    printf("ETAT depile\n");
+    nb_variables = pile_etat_var[nb_etat_var];
+}
 
